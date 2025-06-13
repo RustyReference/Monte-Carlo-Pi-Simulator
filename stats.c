@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <inttypes.h>
 #include <pthread.h>
 #include "functions.h"
@@ -46,7 +47,7 @@ void mean(RNode *list, long double both[2], uintmax_t len) {
 /**
  * @return the square root of the number as a long double via Newton's mathod
  */
-long double sqrt(long double num) {
+long double long_sqrt(long double num) {
     long double root = 1;
     int i;
     for (i = 0; i < 20; i++) {
@@ -85,7 +86,7 @@ void *calc_params(void *args) {
     }
  
     full_args->params_ret->variance = variance = delta / full_args->len;
-    full_args->params_ret->std_dev = sqrt(variance);
+    full_args->params_ret->std_dev = long_sqrt(variance);
     full_args->params_ret->avg = full_args->avg;
 
     return NULL;
@@ -97,19 +98,16 @@ void *calc_params(void *args) {
  * @param both will be populated with results after this function calls
  *      both[0]: the Params of the time durations of the simulations
  *      both[1]: the Params of the estimations of the simulations
- * @param the average of the time durations of the simulations
- * @param the average of the estimations of the simulations
  */
-void getParams(
-    RNode *list, 
-    Params both[2], 
-    long double time_avg, 
-    long double est_avg
-) {
-    uintmax_t len = length(list);
+void get_params(RNode *list, Params both[2]) {
     pthread_t time_thr, est_thr;
-    ParamArgs time_params = { TIME, len, time_avg, list, &both[0] };
-    ParamArgs est_params = { EST, len, est_avg, list, &both[1] };
+    long double time_then_est[2]; // [0]: average of times
+                                  // [1]: average of estimations
+    
+    uintmax_t len = length(list);
+    mean(list, time_then_est, len);
+    ParamArgs time_params = { TIME, len, time_then_est[0], list, &both[0] };
+    ParamArgs est_params = { EST, len, time_then_est[1], list, &both[1] };
 
     // Start one thread for the statistical parameters for time durations
     pthread_create(&time_thr, NULL, calc_params, &time_params);
