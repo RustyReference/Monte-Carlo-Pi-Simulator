@@ -67,6 +67,11 @@ void *calc_params(void *args) {
     ParamArgs *full_args = (ParamArgs *)args;
     RNode *list = full_args->list;
     long double rand_var, variance, delta = 0;
+    
+    if (list == NULL) {
+        printf("Failed to run thread for parameter calculation: Invalid list.\n");
+        return NULL;
+    }
 
     // Check if this calculation is for times or estimations.
     if (full_args->flag == TIME) {
@@ -75,11 +80,11 @@ void *calc_params(void *args) {
         rand_var = list->res->estimate;
     } else {
         printf("Failed to run thread for parameter calculation: Invalid flag.\n");
-        exit(1);
+        return NULL;
     }
 
     // variance = (sum(x_i - AVERAGE))^2 / N
-    while (list != NULL) {
+    while (list != NULL && list->res != NULL) {
         long double diff = (rand_var - full_args->avg);
         delta += diff * diff;
         list = list->next;
@@ -110,12 +115,23 @@ void get_params(RNode *list, Params both[2]) {
     ParamArgs est_params = { EST, len, time_then_est[1], list, &both[1] };
 
     // Start one thread for the statistical parameters for time durations
-    pthread_create(&time_thr, NULL, calc_params, &time_params);
-
-    // Start one thread for the statistical parameters for the estimations
-    pthread_create(&est_thr, NULL, calc_params, &est_params);
+    if (pthread_create(&time_thr, NULL, calc_params, &time_params)) {
+        printf("Failed to create thread for calculating parameters for times.\n");
+        return;
+    }
     
+    // Start one thread for the statistical parameters for the estimations
+    if (pthread_create(&est_thr, NULL, calc_params, &est_params)) {
+        printf("Failed to create thread for calculating parameters for estimations.\n");
+        return;
+    }
+        
     // Wait for both threads to finish
-    pthread_join(time_thr, NULL);
-    pthread_join(est_thr, NULL);
+    if (pthread_join(time_thr, NULL)) {
+        printf("Failed to wait for time-calculating thread.\n");
+    }
+    
+    if (pthread_join(est_thr, NULL)) {
+        printf("Failed to wait for estimate-calculating thread.\n");
+    }
 }

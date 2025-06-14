@@ -35,23 +35,24 @@ void run() {
 	printf("\n\n");
 	
 	// Acquire statistical parameters for times and estimations.
+	iter = list; // Reset iter to the beginning
 	get_params(iter, time_then_est);
 	time_params = time_then_est[0];
 	est_params = time_then_est[1];
 
 	printf("--- PARAMETERS FOR TIME ---\n");
-	printf("Expected Value:		%Lf\n", time_params.avg);
-	printf("Variance:			%Lf\n", time_params.variance);
-	printf("Standard Deviation:	%Lf\n\n", time_params.std_dev);
+	printf("%-20s %Lf\n", "Expected Value:", time_params.avg);
+	printf("%-20s %Lf\n", "Variance:", time_params.variance);
+	printf("%-20s %Lf\n\n", "Standard Deviation:", time_params.std_dev);
 
 	printf("--- PARAMETERS FOR ESTIMATIONS ---\n");
-	printf("Expected Value:		%Lf\n", est_params.avg);
-	printf("Variance:			%Lf\n", est_params.variance);
-	printf("Standard Deviation:	%Lf\n", est_params.std_dev);
+	printf("%-20s %Lf\n", "Expected Value:", est_params.avg);
+	printf("%-20s %Lf\n", "Variance:", est_params.variance);
+	printf("%-20s %Lf\n\n", "Standard Deviation:", est_params.std_dev);
 }
 
 int main() {
-	/*
 	run();
+	/*
 	*/
 }
