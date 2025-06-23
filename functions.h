@@ -11,6 +11,7 @@ typedef struct {
 	long double time; 		// Elapsed time
 	long double estimate;
 	uintmax_t num_trials;
+	uintmax_t id;
 } Result;
 
 /**
@@ -35,12 +36,12 @@ typedef struct {
 /**
  * @return random double [0, 1.0)
  */
-double rand_double();
+long double rand_double();
 
 /**
  * Runs the Monte Carlo Simulation to estimate Pi
  */
-long double mc_sim(uintmax_t num_trials); 
+long double mc_sim(uintmax_t num_trials, uintmax_t res_id); 
 
 /**
  * Prompts for number of trials
@@ -52,11 +53,11 @@ uintmax_t get_num_trials();
  * Prompt for and
  * @return the number of trials 
  */
-uintmax_t get_num_tests();
+uintmax_t get_num_sims();
 
 /**
  * Runs the Monte Carlo simulation with 'trials' number of trials
  * @return an object describing the results
  */
-Result *run_test(uintmax_t trials);
+Result *run_test(uintmax_t trials, uintmax_t res_id);
 #endif

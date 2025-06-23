@@ -69,7 +69,7 @@ void *calc_params(void *args) {
     long double rand_var, variance, delta = 0;
     
     if (list == NULL) {
-        printf("Failed to run thread for parameter calculation: Invalid list.\n");
+        fprintf(stderr, "Failed to run thread for parameter calculation: Invalid list.\n");
         return NULL;
     }
 
@@ -79,7 +79,7 @@ void *calc_params(void *args) {
     } else if (full_args->flag == EST) {
         rand_var = list->res->estimate;
     } else {
-        printf("Failed to run thread for parameter calculation: Invalid flag.\n");
+        fprintf(stderr, "Failed to run thread for parameter calculation: Invalid flag.\n");
         return NULL;
     }
 
@@ -98,7 +98,8 @@ void *calc_params(void *args) {
 }
 
 /**
- * Populates an array of objects containing all statistical parameters of the tests
+ * Populates an array of objects containing all statistical parameters of 
+ * the simulations
  * @param list the head of a linked list of RNodes
  * @param both will be populated with results after this function calls
  *      both[0]: the Params of the time durations of the simulations
@@ -116,22 +117,22 @@ void get_params(RNode *list, Params both[2]) {
 
     // Start one thread for the statistical parameters for time durations
     if (pthread_create(&time_thr, NULL, calc_params, &time_params)) {
-        printf("Failed to create thread for calculating parameters for times.\n");
+        fprintf(stderr, "Failed to create thread for calculating parameters for times.\n");
         return;
     }
     
     // Start one thread for the statistical parameters for the estimations
     if (pthread_create(&est_thr, NULL, calc_params, &est_params)) {
-        printf("Failed to create thread for calculating parameters for estimations.\n");
+        fprintf(stderr, "Failed to create thread for calculating parameters for estimations.\n");
         return;
     }
         
     // Wait for both threads to finish
     if (pthread_join(time_thr, NULL)) {
-        printf("Failed to wait for time-calculating thread.\n");
+        fprintf(stderr, "Failed to wait for time-calculating thread.\n");
     }
     
     if (pthread_join(est_thr, NULL)) {
-        printf("Failed to wait for estimate-calculating thread.\n");
+        fprintf(stderr, "Failed to wait for estimate-calculating thread.\n");
     }
 }

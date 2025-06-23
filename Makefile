@@ -6,6 +6,7 @@ test:
 
 clean:
 	rm main 
+	rm -r plots
 	rm -r main.dSYM
 
 cleanTest: 

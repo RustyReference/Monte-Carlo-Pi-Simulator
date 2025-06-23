@@ -5,7 +5,6 @@
 #include <errno.h>
 
 /* All functions for RNode and Result (RNode stands for Result-Node) */
-
 /**
  * @return pointer to an empty RNode (for linked lists)
  */
@@ -13,7 +12,7 @@ RNode *create_RNode() {
 	errno = 0;
 	RNode *new_rn = (RNode *) malloc(sizeof(RNode));
 	if (new_rn == NULL) {
-		printf("Failed to allocate memory for RNode: %s\n", strerror(errno));
+		fprintf(stderr, "Failed to allocate memory for RNode: %s\n", strerror(errno));
 		exit(1);
 	}
 
@@ -36,7 +35,8 @@ uintmax_t length(RNode *list) {
  * Prints the Result's attributes
  */
 void print_res(Result *res) {
-	printf("\nTime:             %Lf seconds\n",res->time);
-	printf("Number of Trials: %ju\n", res->num_trials);
-	printf("Estimation:       %Lf\n\n", res->estimate);
+	printf("%-20s %20ju\n", "Simulation ID:", res->id);
+	printf("%-20s %20ju\n", "Number of Trials:", res->num_trials);
+	printf("%-20s %.18Lf\n", "Time (seconds):", res->time);
+	printf("%-20s %.18Lf\n\n", "Estimation:", res->estimate);
 }
