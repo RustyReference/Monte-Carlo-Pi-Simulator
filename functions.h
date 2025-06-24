@@ -60,4 +60,30 @@ uintmax_t get_num_sims();
  * @return an object describing the results
  */
 Result *run_test(uintmax_t trials, uintmax_t res_id);
+
+/**
+ * Creates a  linked list of RNodes that iter points to by running 
+ * 'trials' tests
+ * 
+ * @param trials the number of points randomly generated in each test
+ * @param tests the number of Monte Carlo simulations run 
+ * @param iter the pointer used to initialize each node, initially
+ * 		set equal to the address of head of the list.
+ */
+void create_list(uintmax_t trials, uintmax_t tests, RNode *iter);
+
+/**
+ * Prints the parameters of the durations and pi-estimations of 
+ * the simulations
+ * @param time_params the address to parameters of the durations
+ * @param est_params the address to parameters of the estimations
+ */
+void print_params(Params *time_params, Params *est_params);
+
+/**
+ * Prints all Results in the RNode linked list
+ * @param iter the pointer to the head of the linked list
+ */
+void print_list(RNode *list);
+
 #endif

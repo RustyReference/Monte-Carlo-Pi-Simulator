@@ -19,6 +19,7 @@ if not os.path.exists(path):
 # Load all the points of the file the user has chosen
 df = pd.read_csv(path)
 
+# Configure the plot's axes, size, x- and y-limits
 plt.figure(figsize=(3, 3), layout="constrained")
 plt.title("All Point Positions")
 plt.xlabel("X Position")

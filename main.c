@@ -14,41 +14,21 @@ void run() {
 	tests = get_num_sims();
 	trials = get_num_trials();
 
-	uintmax_t i;
-	Result *res;
-	for (i = 0; i < tests - 1; i++) {
-		res = run_test(trials, i);
-		iter->res = res;
-		iter->next = create_RNode();
-		iter = iter->next;
-	}
-	res = run_test(trials, i);
-	iter->res = res;
-	iter->next = NULL;
+	// Create linked list of RNodes (Result-Nodes)
+	create_list(trials, tests, iter);
 
-	iter = list;
-	while (iter != NULL) {
-		print_res(iter->res);
-		iter = iter->next;
-	}
-
+	// Print the list
+	print_list(list);
 	printf("\n\n");
 	
 	// Acquire statistical parameters for times and estimations.
-	iter = list; // Reset iter to the beginning
+	iter = list; 						// Reset iter to the beginning
 	get_params(iter, time_then_est);
-	time_params = time_then_est[0];
-	est_params = time_then_est[1];
+	time_params	= time_then_est[0];
+	est_params	= time_then_est[1];
 
-	printf("--- PARAMETERS FOR TIME ---\n");
-	printf("%-20s %.18Lf\n", "Expected Value:", time_params.avg);
-	printf("%-20s %.18Lf\n", "Variance:", time_params.variance);
-	printf("%-20s %.18Lf\n\n", "Standard Deviation:", time_params.std_dev);
-
-	printf("--- PARAMETERS FOR ESTIMATIONS ---\n");
-	printf("%-20s %.18Lf\n", "Expected Value:", est_params.avg);
-	printf("%-20s %.18Lf\n", "Variance:", est_params.variance);
-	printf("%-20s %.18Lf\n\n", "Standard Deviation:", est_params.std_dev);
+	// Print the parameters
+	print_params(&time_params, &est_params);
 }
 
 int main() {

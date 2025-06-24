@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <errno.h>
 #include "functions.h"
+#include "result_functions.h"
 #define MAX_INPUT 11	// The max number of digits in uintmax_t
 #define BASE 10			// The number base used
 
@@ -166,4 +167,57 @@ Result *run_test(uintmax_t trials, uintmax_t res_id) {
 	res->num_trials = trials;
 	res->id = res_id;
 	return res;
+}
+
+/**
+ * Creates a  linked list of RNodes that iter points to by running 
+ * 'trials' tests
+ * 
+ * @param trials the number of points randomly generated in each test
+ * @param tests the number of Monte Carlo simulations run 
+ * @param iter the pointer used to initialize each node, initially
+ * 		set equal to the address of head of the list.
+ */
+void create_list(uintmax_t trials, uintmax_t tests, RNode *iter) {
+	uintmax_t i;
+	Result *res;
+	for (i = 0; i < tests - 1; i++) {
+		res = run_test(trials, i);
+		iter->res = res;
+		iter->next = create_RNode();
+		iter = iter->next;
+	}
+	res = run_test(trials, i);
+	iter->res = res;
+	iter->next = NULL;
+}
+
+/**
+ * Prints the parameters of the durations and pi-estimations of 
+ * the simulations
+ * @param time_params the address to parameters of the durations
+ * @param est_params the address to parameters of the estimations
+ */
+void print_params(Params *time_params, Params *est_params) {
+	printf("--- PARAMETERS FOR TIME ---\n");
+	printf("%-20s %.18Lf\n", "Expected Value:", time_params->avg);
+	printf("%-20s %.18Lf\n", "Variance:", time_params->variance);
+	printf("%-20s %.18Lf\n\n", "Standard Deviation:", time_params->std_dev);
+
+	printf("--- PARAMETERS FOR ESTIMATIONS ---\n");
+	printf("%-20s %.18Lf\n", "Expected Value:", est_params->avg);
+	printf("%-20s %.18Lf\n", "Variance:", est_params->variance);
+	printf("%-20s %.18Lf\n\n", "Standard Deviation:", est_params->std_dev);
+}
+
+/**
+ * Prints all Results in the RNode linked list
+ * @param iter the pointer to the head of the linked list
+ */
+void print_list(RNode *list) {
+	RNode *iter = list;
+		while (iter != NULL) {
+		print_res(iter->res);
+		iter = iter->next;
+	}
 }
