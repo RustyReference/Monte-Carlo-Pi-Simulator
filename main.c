@@ -11,24 +11,28 @@ void run() {
 	RNode *list = create_RNode();
 	RNode *iter = list;
 
-	tests = get_num_sims();
-	trials = get_num_trials();
+	while (1) {
+		uint8_t choice = get_choice();	// Prompt user for action
 
-	// Create linked list of RNodes (Result-Nodes)
-	create_list(trials, tests, iter);
+		// Prompt for number of simulations, then number of trials
+		tests	= get_num_sims();
+		trials	= get_num_trials();
 
-	// Print the list
-	print_list(list);
-	printf("\n\n");
-	
-	// Acquire statistical parameters for times and estimations.
-	iter = list; 						// Reset iter to the beginning
-	get_params(iter, time_then_est);
-	time_params	= time_then_est[0];
-	est_params	= time_then_est[1];
+		// Create linked list of RNodes (Result-Nodes)
+		create_list(trials, tests, iter);
 
-	// Print the parameters
-	print_params(&time_params, &est_params);
+		// Print the list
+		print_list(list);
+		printf("\n\n");
+		
+		// Acquire statistical parameters for times and estimations.
+		get_params(list, time_then_est);
+		time_params	= time_then_est[0];
+		est_params	= time_then_est[1];
+
+		// Print the parameters
+		print_params(&time_params, &est_params);
+	}
 }
 
 int main() {

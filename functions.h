@@ -86,4 +86,9 @@ void print_params(Params *time_params, Params *est_params);
  */
 void print_list(RNode *list);
 
+/**
+ * @return the number representing the user's desired course of action.
+ */
+uint8_t get_choice();
+
 #endif

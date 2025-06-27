@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <float.h>
+#include <ctype.h>
 #include <inttypes.h>
 #include <time.h>
 #include <sys/stat.h>
@@ -12,29 +13,114 @@
 #define MAX_INPUT 11	// The max number of digits in uintmax_t
 #define BASE 10			// The number base used
 
+typedef struct {
+	uintmax_t 	val;	// Stores the returned uintmax_t if function succeeded
+	uint8_t		err_flag;
+} StouResult;
+
 /**
- * Prompt for and
- * @return the number of trials 
+ * Takes user input, with error checking
+ * 
+ * @param input the input buffer to store input in
+ */
+void get_input(char input[MAX_INPUT]) {
+	errno = 0;
+	if (fgets(input, MAX_INPUT, stdin) == NULL) {
+		fprintf(stderr, "\nget_input(): Error reading input: %s\n", 
+			strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+}
+
+/**
+ * Convert a string into a uintmax_t with error checking.
+ * (should be casted by caller if a smaller int type is desired.)
+ * 
+ * Will error if... 
+ * 		- the resulting number is out of bounds for uintmax_t
+ *		- the string is not fully a number
+ * 
+ * @param input the string to convert to an unsigned int
+ * @return the string as an int, or 
+ */
+uintmax_t str_to_uint(char input[MAX_INPUT]) {
+	uintmax_t val;
+	char *endptr;
+	
+	// Check if the number is negative
+	if (*input == '-') {
+		fprintf(stderr, "\nstr_to_uint(): Error converting input: %s\n",
+			"Cannot convert negative numbers.");
+		exit(EXIT_FAILURE);
+	}
+
+	// Conversion to uint w/ error checking
+	endptr = NULL;
+	val = strtoumax(input, &endptr, BASE);
+	if (errno) {
+		fprintf(stderr, "\nstr_to_uint(): Error converting input: %s\n", 
+			strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+
+	// Check if the string has any letters in it 
+	if (*endptr != '\0') {
+		fprintf(stderr, "\nstr_to_uint(): Error converting input: %s\n",
+			"Input parameter 'char *input' is not fully a string.");
+		exit(EXIT_FAILURE);
+	}
+	
+	return val;
+}
+
+/**
+ * Convert a string into a uintmax_t with error checking, but will
+ * return an error flag if a recoverable error is met.
+ * (should be casted by caller if a smaller int type is desired.)
+ * 
+ * Will fatally error if... 
+ * 		- the resulting number is out of bounds for uintmax_t
+ * Will return an error flag if...
+ *		- the string is not fully a number
+ * 		- the string begins with a negative number
+ *
+ * @param input the string to convert to an unsigned int
+ * @return a struct containing the value and an error flag, where
+ * 		the error flag will be equal to 1 if the function failed
+ * 		in a recoverable way.
+ */
+StouResult stou_checked(char input[MAX_INPUT]) {
+	errno = 0;
+	StouResult res = {0};
+	char *endptr;
+	
+	// Conversion to uint w/ error checking
+	endptr 	= NULL;
+	res.val = strtoumax(input, &endptr, BASE);
+	if (errno) {
+		fprintf(stderr, "\nstr_to_uint(): Error converting input: %s\n", 
+			strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+
+	// Check if the number is negative or if the string has letters
+	if (*input == '-' || *endptr != '\0') {
+		res.err_flag = 1;
+	}
+	
+	return res;
+}
+
+/**
+ * @return the number of simulations after prompting for it
  */
 uintmax_t get_num_sims() {
-	uintmax_t tests;
-	char buff[MAX_INPUT], *endptr = NULL;
+	uintmax_t	tests;
+	char 		buff[MAX_INPUT];
+
 	printf("Enter the number of tests: ");
-
-	// Get number of tests from user
-	errno = 0;
-	if (fgets(buff, MAX_INPUT, stdin) == NULL) {
-		fprintf(stderr, "\nError reading number of tests: %s\n", strerror(errno));
-		exit(EXIT_FAILURE);
-	}
-
-	// Convert input to uintmax_t
-	errno = 0;
-	tests = (uintmax_t)strtoumax(buff, &endptr, BASE);
-	if (errno) {
-		fprintf(stderr, "Error converting number of tests to number: %s\n", strerror(errno));
-		exit(EXIT_FAILURE);
-	}
+	get_input(buff); 				// Get number of tests from user
+	tests = str_to_uint(buff); 		// Convert input to uintmax_t
 
 	return tests;
 }
@@ -43,8 +129,8 @@ uintmax_t get_num_sims() {
  * @return random long double [0, 1.0)
  */
 long double rand_double() {
-	unsigned long long r = 0;
 	#define RANDOM_BITS 15
+	unsigned long long r = 0;
 	int i;
 	for (i = 0; i < LDBL_MANT_DIG; i += RANDOM_BITS) {
 		r <<= RANDOM_BITS;
@@ -52,7 +138,7 @@ long double rand_double() {
 	}
 
 	r %= 1uLL << LDBL_MANT_DIG; // Remove lower bits
-	long double dr = r; // Convert to long double
+	long double dr = r; 		// Convert to long double
 	dr /= 1uLL << LDBL_MANT_DIG;
 	return dr;
 }
@@ -81,7 +167,7 @@ long double mc_sim(uintmax_t num_trials, uintmax_t res_id) {
 		if (mkdir("plots", 0700) == -1) {
 			fprintf(
 				stderr, 
-				"mc_sim: Error creating directory 'plots': %s", 
+				"mc_sim(): Error creating directory 'plots': %s\n", 
 				strerror(errno));
 			exit(EXIT_FAILURE);
 		}
@@ -93,10 +179,11 @@ long double mc_sim(uintmax_t num_trials, uintmax_t res_id) {
 
 	FILE *csv = fopen(filename, "w");
 	if (!csv) {
-		fprintf(stderr, "mc_sim: Error opening file: %s", strerror(errno));
+		fprintf(stderr, "mc_sim(): Error opening file: %s\n", strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 	fprintf(csv, "x,y,inside\n");
+
 	srand(clock());
 	
 	// Number of points that landed inside the quarter circle
@@ -121,26 +208,14 @@ long double mc_sim(uintmax_t num_trials, uintmax_t res_id) {
  */
 uintmax_t get_num_trials() {
 	errno = 0;
-	uintmax_t trials;
-	char input[MAX_INPUT];
+	uintmax_t 	trials;
+	char 		input[MAX_INPUT];
 
-	// Prompt for number of trials
 	printf("Enter the number of trials you want to use: ");
-	fflush(stdout);
+	fflush(stdout);					// Flush for purposes of testing functions
 
-	// Input with error checking
-	if (fgets(input, MAX_INPUT, stdin) == NULL) {
-		fprintf(stderr, "\nError reading trials: %s\n", strerror(errno));
-		exit(EXIT_FAILURE);
-	}
-
-	// Conversion to uint w/ error checking
-	char *endptr = NULL;
-	trials = (uintmax_t)strtoumax(input, &endptr, BASE);
-	if (errno) {
-		fprintf(stderr, "\nError converting input: %s", strerror(errno));
-		exit(EXIT_FAILURE);
-	}
+	get_input(input);				// Get number of trials
+	trials = str_to_uint(input);	// Conversion to uint w/ error checking
 
 	return trials;
 }
@@ -152,7 +227,7 @@ uintmax_t get_num_trials() {
  * @return an object describing the results
  */
 Result *run_test(uintmax_t trials, uintmax_t res_id) {
-	clock_t start;
+	clock_t 	start;
 	long double estimation, elapsed;
 
 	// Run simulation and record it's duration 
@@ -216,8 +291,37 @@ void print_params(Params *time_params, Params *est_params) {
  */
 void print_list(RNode *list) {
 	RNode *iter = list;
-		while (iter != NULL) {
+	while (iter != NULL) {
 		print_res(iter->res);
 		iter = iter->next;
 	}
+}
+
+/**
+ * @return the number representing the user's desired course of action.
+ */
+uint8_t get_choice() {
+	errno = 0;
+	StouResult	choice;
+	char 		input[MAX_INPUT];
+
+	while (1) {
+		printf("What do you want to do?\n");
+		printf("%-20hhu: %20s\n", 1, "Run tests");
+		printf("%-20hhu: %20s\n", 2, "Print tests");
+		printf("%-20hhu: %20s\n", 3, "Get and Print Population Parameters");
+		printf("%-20hhu: %20s\n", 4, "Exit");
+
+		get_input(input);
+		choice = stou_checked(input);
+
+		if (choice.err_flag == 0) {
+			break;
+		}
+
+		printf("\nInvalid choice.\n");
+	}
+
+
+	return (uint8_t) choice.val;
 }
