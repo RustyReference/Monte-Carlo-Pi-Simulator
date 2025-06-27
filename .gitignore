@@ -1,1 +1,5 @@
+# Mac-specific directory files
 .DS_Store
+
+# Debugger symbols
+*.dSYM
