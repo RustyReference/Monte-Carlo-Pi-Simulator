@@ -76,7 +76,7 @@ uintmax_t str_to_uint(char input[MAX_INPUT]) {
 /**
  * Convert a string into a uintmax_t with error checking, but will
  * return an error flag if a recoverable error is met.
- * (should be casted by caller if a smaller int type is desired.)
+ * (Output should be casted by caller if a smaller int type is desired.)
  * 
  * Will fatally error if... 
  * 		- the resulting number is out of bounds for uintmax_t
@@ -98,12 +98,12 @@ StouResult stou_checked(char input[MAX_INPUT]) {
 	endptr 	= NULL;
 	res.val = strtoumax(input, &endptr, BASE);
 	if (errno) {
-		fprintf(stderr, "\nstr_to_uint(): Error converting input: %s\n", 
+		fprintf(stderr, "\nstou_checked(): Error converting input: %s\n", 
 			strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 
-	// Check if the number is negative or if the string has letters
+	// Check if the number is negative or if the string has non-numbers
 	if (*input == '-' || *endptr != '\0') {
 		res.err_flag = 1;
 	}
@@ -295,9 +295,12 @@ void print_list(RNode *list) {
 		print_res(iter->res);
 		iter = iter->next;
 	}
+	printf("\n\n");
 }
 
 /**
+ * Prompts the user for a number to choose what to do
+ * 
  * @return the number representing the user's desired course of action.
  */
 uint8_t get_choice() {
@@ -319,9 +322,12 @@ uint8_t get_choice() {
 			break;
 		}
 
-		printf("\nInvalid choice.\n");
+		if (choice.val > 4) {
+			printf("\nNumber choice must be between 1 and 4, inclusive: ");
+		} else  {
+			printf("\nInvalid choice: ");
+		}
 	}
-
 
 	return (uint8_t) choice.val;
 }
