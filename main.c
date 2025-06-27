@@ -6,11 +6,11 @@
 #include "stats.h"
 
 int main() {
-	uint8_t list_created = 0; 	// Has the list has been created?
-	uintmax_t sims, trials;
-	Params time_then_est[2], time_params, est_params;
-	RNode *list = create_RNode();
-	RNode *iter = list;
+	uint8_t 	list_created = 0; 	// Has the list has been created?
+	uintmax_t 	sims, trials;
+	Params 		time_then_est[2], time_params, est_params;
+	RNode 		*list = create_RNode();
+	RNode 		*iter = list;
 
 	while (1) {
 		uint8_t choice = get_choice();	// Prompt user for action
@@ -29,6 +29,10 @@ int main() {
 				}
 				break;
 			case 3:
+				// Check if list has been created
+				if (!list_created) {
+					break;
+				}
 				// Acquire statistical parameters for times and estimations.
 				get_params(list, time_then_est);
 				time_params	= time_then_est[0];
