@@ -64,9 +64,9 @@ uintmax_t str_to_uint(char input[MAX_INPUT]) {
 	}
 
 	// Check if the string has any letters in it 
-	if (*endptr != '\0') {
+	if (*endptr != '\0' && *endptr != '\n') {
 		fprintf(stderr, "\nstr_to_uint(): Error converting input: %s\n",
-			"Input parameter 'char *input' is not fully a string.");
+			"Input parameter 'char *input' is not fully a number.");
 		exit(EXIT_FAILURE);
 	}
 	
@@ -104,7 +104,7 @@ StouResult stou_checked(char input[MAX_INPUT]) {
 	}
 
 	// Check if the number is negative or if the string has non-numbers
-	if (*input == '-' || *endptr != '\0') {
+	if (*input == '-' || (*endptr != '\0' && *endptr != '\n')) {
 		res.err_flag = 1;
 	}
 	
@@ -179,7 +179,8 @@ long double mc_sim(uintmax_t num_trials, uintmax_t res_id) {
 
 	FILE *csv = fopen(filename, "w");
 	if (!csv) {
-		fprintf(stderr, "mc_sim(): Error opening file: %s\n", strerror(errno));
+		fprintf(stderr, "mc_sim(): Error opening file: %s\n", 
+			strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 	fprintf(csv, "x,y,inside\n");
@@ -212,10 +213,10 @@ uintmax_t get_num_trials() {
 	char 		input[MAX_INPUT];
 
 	printf("Enter the number of trials you want to use: ");
-	fflush(stdout);					// Flush for purposes of testing functions
+	fflush(stdout);				// Flush for purposes of testing functions
 
-	get_input(input);				// Get number of trials
-	trials = str_to_uint(input);	// Conversion to uint w/ error checking
+	get_input(input);			// Get number of trials
+	trials = str_to_uint(input);// Conversion to uint w/ error checking
 
 	return trials;
 }
@@ -295,7 +296,6 @@ void print_list(RNode *list) {
 		print_res(iter->res);
 		iter = iter->next;
 	}
-	printf("\n\n");
 }
 
 /**
@@ -309,11 +309,11 @@ uint8_t get_choice() {
 	char 		input[MAX_INPUT];
 
 	while (1) {
-		printf("What do you want to do?\n");
-		printf("%-20hhu: %20s\n", 1, "Run tests");
-		printf("%-20hhu: %20s\n", 2, "Print tests");
-		printf("%-20hhu: %20s\n", 3, "Get and Print Population Parameters");
-		printf("%-20hhu: %20s\n", 4, "Exit");
+		printf("\nWhat do you want to do?\n");
+		printf("%-10s %40s\n", "1:", "Run tests");
+		printf("%-10s %40s\n", "2:", "Print test results");
+		printf("%-10s %40s\n", "3:", "Get and Print Population Parameters");
+		printf("%-10s %40s\n", "4:", "Exit");
 
 		get_input(input);
 		choice = stou_checked(input);

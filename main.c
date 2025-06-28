@@ -12,7 +12,8 @@ int main() {
 	RNode 		*list = create_RNode();
 	RNode 		*iter = list;
 
-	while (1) {
+	uint8_t done = 0;
+	while (!done) {
 		uint8_t choice = get_choice();	// Prompt user for action
 		switch (choice) {
 			case 1: 
@@ -24,13 +25,16 @@ int main() {
 				break;
 			case 2: 
 				// If tests have been run, then print list of results
-				if (list_created) {
-					print_list(list);
+				if (!list_created) {
+					printf("\nYou must run tests first; choose option 1.\n");
+					break;
 				}
+				print_list(list);
 				break;
 			case 3:
 				// Check if list has been created
 				if (!list_created) {
+					printf("\nYou must run tests first; choose option 1.\n");
 					break;
 				}
 				// Acquire statistical parameters for times and estimations.
@@ -40,7 +44,8 @@ int main() {
 				print_params(&time_params, &est_params); // Then print them
 				break;
 			case 4:
-				printf("Goodbye!\n");
+				printf("\nGoodbye!\n");
+				done = 1;
 		}
 	}
 
