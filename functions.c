@@ -97,7 +97,7 @@ StouResult stou_checked(char input[MAX_INPUT]) {
 	// Conversion to uint w/ error checking
 	endptr 	= NULL;
 	res.val = strtoumax(input, &endptr, BASE);
-	if (errno) {
+	if (errno && (errno != EINVAL)) {
 		fprintf(stderr, "\nstou_checked(): Error converting input: %s\n", 
 			strerror(errno));
 		exit(EXIT_FAILURE);
@@ -313,7 +313,8 @@ uint8_t get_choice() {
 		printf("%-10s %40s\n", "1:", "Run tests");
 		printf("%-10s %40s\n", "2:", "Print test results");
 		printf("%-10s %40s\n", "3:", "Get and Print Population Parameters");
-		printf("%-10s %40s\n", "4:", "Exit");
+		printf("%-10s %40s\n", "4:", "Visualize a simulation");
+		printf("%-10s %40s\n", "5:", "Exit");
 
 		get_input(input);
 		choice = stou_checked(input);
@@ -324,10 +325,79 @@ uint8_t get_choice() {
 
 		if (choice.val > 4) {
 			printf("\nNumber choice must be between 1 and 4, inclusive: ");
-		} else  {
+		} else {
 			printf("\nInvalid choice: ");
 		}
 	}
 
 	return (uint8_t) choice.val;
+}
+
+/** 
+ * Prompt-loop for the Simulation ID of the simulation the user wants
+ * to visualize.
+ * 
+ * @param num_sims the number of simulations the user wanted to create
+ */
+uint8_t visualize_num(uintmax_t num_sims) {
+	char input[MAX_INPUT];
+	StouResult choice;
+	
+	while (1) {
+		printf("\n%s%s",
+			"Which simulation do you want to visualize? ",
+			"(Enter the Simulation ID)\n");
+
+		get_input(input);
+		choice = stou_checked(input);
+
+		if (choice.err_flag == 0) {
+			break;
+		}
+
+		if (choice.val >= num_sims) {
+			printf("\nNumber choice must be between 1 and 4, inclusive: ");
+		} else {
+			printf("\nInvalid choice\n");
+		}
+	}
+
+	return (uint8_t) choice.val;
+}
+
+/**
+ * Runs a Python program to visualize a simulation. 
+ * 
+ * The simulation consists of showing the entire 1x1 square in which
+ * every point is randomly generated, the quarter circle that sweeps from 
+ * the left side to the bottom side, and every single point that was 
+ * randomly generated, so the user can see every point plotted.
+ * 
+ * @param num_sims the number of simulations the user wanted to create
+ */
+void visualize(uintmax_t num_sims) {
+	errno = 0;
+	#define COMM_LEN 25		// assert: strlen(command) <= 24
+	
+	uint8_t num = visualize_num(num_sims);
+	char command[COMM_LEN];
+	int n = snprintf(command, COMM_LEN, "python3 plotter.py %hhu", num);
+	if (n < 0) {
+		fprintf(
+			stderr,
+			"visualize(): Error generating visualization command: %s", 
+			strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+
+	printf("Loading...\n");
+	system(command);		// Run the Python program
+	if (errno != 0) {
+		fprintf(
+			stderr,
+			"visualize(): Error visualizing: %s", 
+			strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+	printf("Rendering succeeded!\n");
 }

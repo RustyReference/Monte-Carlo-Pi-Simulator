@@ -51,7 +51,7 @@ uintmax_t get_num_trials();
 
 /**
  * Prompt for and
- * @return the number of trials 
+ * @return the number of simulations 
  */
 uintmax_t get_num_sims();
 
@@ -93,4 +93,23 @@ void print_list(RNode *list);
  */
 uint8_t get_choice();
 
+/** 
+ * Prompt-loop for the Simulation ID of the simulation the user wants
+ * to visualize.
+ * 
+ * @param num_sims the number of simulations the user wanted to create
+ */
+uint8_t visualize_num(uintmax_t num_sims);
+
+/**
+ * Runs a Python program to visualize a simulation. 
+ * 
+ * The simulation consists of showing the entire 1x1 square in which
+ * every point is randomly generated, the quarter circle that sweeps from 
+ * the left side to the bottom side, and every single point that was 
+ * randomly generated, so the user can see every point plotted.
+ * 
+ * @param num_sims the number of simulations the user wanted to create
+ */
+void visualize(uintmax_t num_sims);
 #endif

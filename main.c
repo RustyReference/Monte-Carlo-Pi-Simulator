@@ -24,7 +24,6 @@ int main() {
 				list_created = 1;
 				break;
 			case 2: 
-				// If tests have been run, then print list of results
 				if (!list_created) {
 					printf("\nYou must run tests first; choose option 1.\n");
 					break;
@@ -32,7 +31,6 @@ int main() {
 				print_list(list);
 				break;
 			case 3:
-				// Check if list has been created
 				if (!list_created) {
 					printf("\nYou must run tests first; choose option 1.\n");
 					break;
@@ -44,6 +42,13 @@ int main() {
 				print_params(&time_params, &est_params); // Then print them
 				break;
 			case 4:
+				if (!list_created) {
+					printf("\nYou must run tests first; choose option 1.\n");
+					break;
+				}
+				visualize(sims);
+				break;
+			case 5:
 				printf("\nGoodbye!\n");
 				done = 1;
 		}
