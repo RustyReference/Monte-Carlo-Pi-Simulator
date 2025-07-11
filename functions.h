@@ -39,24 +39,36 @@ typedef struct {
 long double rand_double();
 
 /**
- * Runs the Monte Carlo Simulation to estimate Pi
+ * Runs a Monte Carlo simulation of random points that lay in a
+ * square with dimensions 1x1, counting the number of points that
+ * landed inside a quarter circle whose radius is 1 and sweeps from 
+ * one side to another side adjacent.
+ * 
+ * Records each point's coordinates in points.csv
+ *
+ * @param num_trials the number of points that will be randomly 
+ * 		placed in the square
+ * @param res_id the id of the Result
+ * @return an estimation of pi (the percentage of points that landed
+ * 		inside the quarter circle, multiplied by 4)
+ * 		*** OR -1 ON ERROR ***
  */
 long double mc_sim(uintmax_t num_trials, uintmax_t res_id); 
 
 /**
- * Prompts for number of trials
- * @return the number of trials
+ * @return the number of trials after prompting for it
  */
 uintmax_t get_num_trials();
 
 /**
- * Prompt for and
- * @return the number of simulations 
+ * @return the number of simulations after prompting for it
  */
 uintmax_t get_num_sims();
 
 /**
  * Runs the Monte Carlo simulation with 'trials' number of trials
+ * @param trials the number of trials (random variables) used
+ * @param res_id the id of the simulation to tell it apart from the others
  * @return an object describing the results
  */
 Result *run_test(uintmax_t trials, uintmax_t res_id);

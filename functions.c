@@ -112,20 +112,6 @@ StouResult stou_checked(char input[MAX_INPUT]) {
 }
 
 /**
- * @return the number of simulations after prompting for it
- */
-uintmax_t get_num_sims() {
-	uintmax_t	tests;
-	char 		buff[MAX_INPUT];
-
-	printf("Enter the number of tests: ");
-	get_input(buff); 				// Get number of tests from user
-	tests = str_to_uint(buff); 		// Convert input to uintmax_t
-
-	return tests;
-}
-
-/**
  * @return random long double [0, 1.0)
  */
 long double rand_double() {
@@ -205,7 +191,19 @@ long double mc_sim(uintmax_t num_trials, uintmax_t res_id) {
 }
 
 /**
- * @return the number of trials after prompting for it
+ * Runs a Monte Carlo simulation of random points that lay in a
+ * square with dimensions 1x1, counting the number of points that
+ * landed inside a quarter circle whose radius is 1 and sweeps from 
+ * one side to another side adjacent.
+ * 
+ * Records each point's coordinates in points.csv
+ *
+ * @param num_trials the number of points that will be randomly 
+ * 		placed in the square
+ * @param res_id the id of the Result
+ * @return an estimation of pi (the percentage of points that landed
+ * 		inside the quarter circle, multiplied by 4)
+ * 		*** OR -1 ON ERROR ***
  */
 uintmax_t get_num_trials() {
 	errno = 0;
@@ -219,6 +217,20 @@ uintmax_t get_num_trials() {
 	trials = str_to_uint(input);// Conversion to uint w/ error checking
 
 	return trials;
+}
+
+/**
+ * @return the number of simulations after prompting for it
+ */
+uintmax_t get_num_sims() {
+	uintmax_t	tests;
+	char 		buff[MAX_INPUT];
+
+	printf("Enter the number of tests: ");
+	get_input(buff); 				// Get number of tests from user
+	tests = str_to_uint(buff); 		// Convert input to uintmax_t
+
+	return tests;
 }
 
 /**
@@ -246,7 +258,7 @@ Result *run_test(uintmax_t trials, uintmax_t res_id) {
 }
 
 /**
- * Creates a  linked list of RNodes that iter points to by running 
+ * Creates a linked list of RNodes that iter points to by running 
  * 'trials' tests
  * 
  * @param trials the number of points randomly generated in each test
