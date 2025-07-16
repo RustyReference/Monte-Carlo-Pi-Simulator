@@ -3,10 +3,10 @@ A program that allows the user to run Multiple Monte Carlo simulations to estima
 
 The formula works as follows:
 
-<code>Number of Points in Quarter Circle: πr<sup>2</sup>/4</code>
+<code>Number of Points in Quarter Circle: πr<sup>2</sup>/4</code>\
 <code>Number of Total Points in Square: r<sup>2</sup></code>
 
-Therefore, <code>π = (πr<sup>2</sup>/4)/(r<sup>2</sup>)</code>
+Therefore, <code>π = 4 * (πr<sup>2</sup>/4)/(r<sup>2</sup>) = (πr<sup>2</sup>)/(r<sup>2</sup>) = π</code>
 
 # Features
 1. Robust error handling via `errno.h` and conditionals. 
