@@ -226,7 +226,7 @@ uintmax_t get_num_sims() {
 	uintmax_t	tests;
 	char 		buff[MAX_INPUT];
 
-	printf("Enter the number of tests: ");
+	printf("Enter the number of simulations: ");
 	get_input(buff); 				// Get number of tests from user
 	tests = str_to_uint(buff); 		// Convert input to uintmax_t
 
@@ -322,7 +322,7 @@ uint8_t get_choice() {
 
 	while (1) {
 		printf("\nWhat do you want to do?\n");
-		printf("%-10s %40s\n", "1:", "Run tests");
+		printf("%-10s %40s\n", "1:", "Run simulations");
 		printf("%-10s %40s\n", "2:", "Print test results");
 		printf("%-10s %40s\n", "3:", "Get and Print Population Parameters");
 		printf("%-10s %40s\n", "4:", "Visualize a simulation");
